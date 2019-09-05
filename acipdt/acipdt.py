@@ -640,7 +640,6 @@ class FabAccPol(object):
     # epg_name: Name of the End Point Group (EPG)
     # vlan_id: vlan-(vlan Number)
     # mode: Regular (Trunk)/ untagged (Access) / native (802.1p)
-    # override_lldp: (optional) Name of the lldp policy
     def aep_vlan(self, **kwargs):
         required_args = {'aep_name': '',
                          'status': '',
