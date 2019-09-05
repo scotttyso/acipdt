@@ -1,4 +1,5 @@
 import requests
+import logging
 import json
 import sys
 import collections
@@ -8,6 +9,11 @@ import pkg_resources
 import time
 
 # Global options for debugging
+# logging.basicConfig()
+# logging.getLogger().setLevel(logging.DEBUG)
+# requests_log = logging.getLogger("requests.packages.urllib3")
+# requests_log.setLevel(logging.DEBUG)
+# requests_log.propagate = False
 PRINT_PAYLOAD = False
 PRINT_RESPONSE_TEXT_ALWAYS = False
 PRINT_RESPONSE_TEXT_ON_FAIL = True
@@ -36,6 +42,7 @@ class LoginFailed(Exception):
 def process_kwargs(required_args, optional_args, **kwargs):
     # Validate all required kwargs passed
     if all(item in kwargs for item in required_args.keys()) is not True:
+        #    print(str(kwargs))
         raise InsufficientArgs('Insufficient required arguments.')
 
     # Load all required args values from kwargs
@@ -48,7 +55,7 @@ def process_kwargs(required_args, optional_args, **kwargs):
 
     # Combine option and required dicts for Jinja template render
     templateVars = {**required_args, **optional_args}
-    return(templateVars)
+    return (templateVars)
 
 
 # Function to execute HTTP Post
@@ -69,7 +76,7 @@ def post(apic, payload, cookies, uri, section=''):
         except Exception as e:
             print("Method {} failed. Exception: {}".format(section[:-5], e))
             status = 666
-            return(status)
+            return (status)
     if PRINT_RESPONSE_TEXT_ALWAYS:
         print(r.text)
     if status != 200 and PRINT_RESPONSE_TEXT_ON_FAIL:
@@ -302,7 +309,7 @@ class FabPodPol(object):
         payload = template.render(templateVars)
 
         uri = 'mo/uni/fabric/bgpInstP-default/rr/node-{}'.format(
-              templateVars['rr'])
+            templateVars['rr'])
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 
@@ -622,6 +629,55 @@ class FabAccPol(object):
         payload = template.render(templateVars)
 
         uri = 'mo/uni/infra/attentp-{}'.format(templateVars['name'])
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # aep_name: Name of the AEP
+    # status: created,modified | deleted
+    # tn_name: Name of the Tenant
+    # ap_name: Name of the Application Profile
+    # epg_name: Name of the End Point Group (EPG)
+    # vlan_id: vlan-(vlan Number)
+    # mode: Regular (Trunk)/ untagged (Access) / native (802.1p)
+    # override_lldp: (optional) Name of the lldp policy
+    def aep_vlan(self, **kwargs):
+        required_args = {'aep_name': '',
+                         'status': '',
+                         'tn_name': '',
+                         'ap_name': '',
+                         'epg_name': '',
+                         'vlan_id': '',
+                         'mode': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if templateVars['aep_name'] not in valid_status:
+            raise InvalidArg('AEP Name invalid')
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+        if templateVars['tn_name'] not in valid_status:
+            raise InvalidArg('Tenant Name invalid')
+        if templateVars['ap_name'] not in valid_status:
+            raise InvalidArg('Application Profile Name invalid')
+        if templateVars['epg_name'] not in valid_status:
+            raise InvalidArg('EPG Name invalid')
+        if not int(templateVars['vlan_id']):
+            raise InvalidArg('VLAN IDs must be an integer')
+        else:
+            templateVars['vlan_id'] = int(templateVars['vlan_id'])
+        if templateVars['mode'] not in valid_status:
+            raise InvalidArg('Port Encapsulation Mode Invalid')
+
+        template_file = "aep_vlan.json"
+        template = self.templateEnv.get_template(template_file)
+
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = 'mo/uni/infra/attentp-{}'.format(templateVars['aep_name'])
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 
@@ -2306,12 +2362,58 @@ class FabL3Pol(object):
     # node_name: Name of the Node Profile
     # pod: ID of the pod
     # sw1: Node ID of first switch as an integer
+    # sw1_loop: IP of node1 loopback as a dotted decimal (no mask)
+    # loopback: yes | no
+    # status: created | created,modified | deleted
+    def node_profile(self, **kwargs):
+        required_args = {'tn_name': '',
+                         'name': '',
+                         'node_name': '',
+                         'pod': '',
+                         'sw1': '',
+                         'sw1_loop': '',
+                         'loopback': '',
+                         'status': ''}
+        optional_args = {}
+
+        templateVars = process_kwargs(required_args, optional_args, **kwargs)
+
+        if not int(templateVars['pod']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['pod'] = int(templateVars['pod'])
+        if not int(templateVars['sw1']):
+            raise InvalidArg('ID must be an integer')
+        else:
+            templateVars['sw1'] = int(templateVars['sw1'])
+        if not ipaddress.ip_address(templateVars['sw1_loop']):
+            raise InvalidArg('Address must be a valid IPv4 address')
+        if templateVars['status'] not in valid_status:
+            raise InvalidArg('Status invalid')
+
+        template_file = "node_profile.json"
+        template = self.templateEnv.get_template(template_file)
+
+        payload = template.render(templateVars)
+
+        uri = ('mo/uni/tn-{}/out-{}/lnodep-{}'
+               .format(templateVars['tn_name'], templateVars['name'], templateVars['node_name']))
+
+        status = post(self.apic, payload, self.cookies, uri, template_file)
+        return status
+
+    # Method must be called with the following kwargs.
+    # tn_name: Name of the Tenant
+    # name: The name of the L3-Out
+    # node_name: Name of the Node Profile
+    # pod: ID of the pod
+    # sw1: Node ID of first switch as an integer
     # sw2: Node ID of second switch as an integer
     # sw1_loop: IP of node1 loopback as a dotted decimal (no mask)
     # sw2: Node ID of first switch as an integer
     # loopback: yes | no
     # status: created | created,modified | deleted
-    def node_profile(self, **kwargs):
+    def node_profile_both(self, **kwargs):
         required_args = {'tn_name': '',
                          'name': '',
                          'node_name': '',
@@ -2345,13 +2447,15 @@ class FabL3Pol(object):
         if templateVars['status'] not in valid_status:
             raise InvalidArg('Status invalid')
 
-        template_file = "node_profile.json"
+        template_file = "node_profile_both.json"
         template = self.templateEnv.get_template(template_file)
 
         payload = template.render(templateVars)
 
-        uri = ('mo/uni/tn-{}/out-{}'
-               .format(templateVars['tn_name'], templateVars['name']))
+        uri = ('mo/uni/tn-{}/out-{}/lnodep-{}'
+               .format(templateVars['tn_name'], templateVars['name'], templateVars['node_name']))
+        #       uri = ('mo/uni/tn-{}/out-{}'
+        #               .format(templateVars['tn_name'], templateVars['name']))
         status = post(self.apic, payload, self.cookies, uri, template_file)
         return status
 
@@ -3193,7 +3297,7 @@ class Query(object):
         s = requests.Session()
         try:
             r = s.get('https://{}/api/node/mo/{}.json{}'.format(self.apic, dn,
-                      query_filter), cookies=self.cookies, verify=False)
+                                                                query_filter), cookies=self.cookies, verify=False)
             status = r.status_code
             payload = json.loads(r.text)
         except Exception as e:
@@ -3205,7 +3309,7 @@ class Query(object):
         s = requests.Session()
         try:
             r = s.get('https://{}/api/node/class/{}.json{}'.format(self.apic,
-                      query_class, query_filter), cookies=self.cookies,
+                                                                   query_class, query_filter), cookies=self.cookies,
                       verify=False)
             status = r.status_code
             payload = json.loads(r.text)
