@@ -1,0 +1,36 @@
+{
+	"l3extLNodeP": {
+		"attributes": {
+			"dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}",
+			"name": "{{node_name}}",
+			"rn": "lnodep-{{node_name}}",
+			"status": "created"
+		},
+		"children": [{
+			"l3extRsNodeL3OutAtt": {
+				"attributes": {
+					"dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw1}}]",
+					"tDn": "topology/pod-{{pod}}/node-{{sw1}}",
+					"rtrId": "{{sw1_loop}}",
+					"rtrIdLoopBack": "{{loopback}}",
+					"rn": "rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw1}}]",
+					"status": "created"
+				},
+				"children": []
+			}
+		},
+		{
+			"l3extRsNodeL3OutAtt": {
+				"attributes": {
+					"dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw2}}]",
+					"tDn": "topology/pod-{{pod}}/node-{{sw2}}",
+					"rtrId": "{{sw2_loop}}",
+					"rtrIdLoopBack": "{{loopback}}",
+					"rn": "rsnodeL3OutAtt-[topology/pod-{{pod}}/node-{{sw2}}]",
+					"status": "created"
+				},
+				"children": []
+			}
+		}]
+	}
+}
