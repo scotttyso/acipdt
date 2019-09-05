@@ -1,19 +1,17 @@
 {
-    "fvBD": {
-        "attributes": {
-            "dn": "uni/tn-{{tn_name}}/BD-{{name}}",
-            "name": "{{name}}",
-            "status": "created,modified"
-        },
-        "children": [
-            {
-                "fvRsBDToOut": {
-                    "attributes": {
-                        "tnL3extOutName": "{{l3_out}}",
-                        "status": "{{status}}"
-                    }
-                }
-            }
-        ]
-    }
+	"fvBD": {
+		"attributes": {
+			"dn": "uni/tn-{{tn_name}}/BD-{{name}}",
+			"name": "{{name}}",
+			"status": "created,modified"
+		},
+		"children": [{
+			"fvRsBDToOut": {
+				"attributes": {
+					"tnL3extOutName": "{{l3_out}}",
+					"status": "{{status}}"
+				}
+			}
+		}]
+	}
 }
