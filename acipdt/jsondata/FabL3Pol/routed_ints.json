@@ -3,19 +3,13 @@
         "attributes": {
             "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}",
             "name": "{{int_profile}}",
+            "rn": "lifp-{{int_profile}}",
             "status": "{{int_profile_status}}"
         },
-        "children": [
-            {
-                "l3extRsNdIfPol": {
-                    "attributes": {
-                        "status": "created,modified"
-                    }
-                }
-            },
-            {
+        "children": [{
                 "l3extRsPathL3OutAtt": {
                     "attributes": {
+                        "dn": "uni/tn-{{tn_name}}/out-{{name}}/lnodep-{{node_name}}/lifp-{{int_profile}}/rspathL3OutAtt-[topology/pod-{{pod}}/paths-{{sw}}/pathep-[eth1/{{port}}]]",
                         "addr": "{{ip}}",
                         "encap": "unknown",
                         "ifInstT": "l3-port",
@@ -23,11 +17,12 @@
                         "mac": "00:22:BD:F8:19:FF",
                         "mode": "regular",
                         "mtu": "inherit",
+			            "tDn": "topology/pod-{{pod}}/paths-{{sw}}/pathep-[eth1/{{port}}]",
                         "rn": "rspathL3OutAtt-[topology/pod-{{pod}}/paths-{{sw}}/pathep-[eth1/{{port}}]]",
                         "status": "{{status}}"
-                    }
+                    },
+                    "children": []
                 }
-            }
-        ]
+            }]
     }
 }
