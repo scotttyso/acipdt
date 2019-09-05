@@ -6,15 +6,14 @@
             "rn": "epg-{{name}}",
             "status": "{{status}}"
         },
-        "children": [
-            {
+        "children": [{
                 "fvRsBd": {
                     "attributes": {
                         "tnFvBDName": "{{bd}}",
-                        "status": "{{status}}"
-                    }
+                        "status": "created,modified"
+                    },
+		    "children": []
                 }
-            }
-        ]
+            }]
     }
 }
