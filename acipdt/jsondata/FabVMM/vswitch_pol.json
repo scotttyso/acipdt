@@ -8,7 +8,7 @@
       {
         "vmmRsVswitchOverrideCdpIfPol": {
           "attributes": {
-            "tDn": "uni/infra/cdpIfP-{{name}}-{{cdp_pol}}",
+            "tDn": "uni/infra/cdpIfP-{{cdp_pol}}",
             "status": "{{status}}"
           }
         }
@@ -16,7 +16,7 @@
       {
         "vmmRsVswitchOverrideLldpIfPol": {
           "attributes": {
-            "tDn": "uni/infra/lldpIfP-{{name}}-{{lldp_pol}}",
+            "tDn": "uni/infra/lldpIfP-{{lldp_pol}}",
             "status": "{{status}}"
           }
         }
