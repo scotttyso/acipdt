@@ -11,7 +11,7 @@
                     "attributes": {
                         "rn": "rsvlanNs",
                         "status": "{{status}}",
-                        "tDn": "uni/infra/vlanns-[{{vlan_pool}}]-dynamic"
+                        "tDn": "uni/infra/vlanns-[{{vlan_pool}}]-static"
                     }
                 }
             }
